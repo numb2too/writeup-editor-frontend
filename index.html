@@ -715,9 +715,6 @@
 
         async function saveArticle(index) {
             try {
-                editingStates[index] = true;
-                renderArticles();
-
                 const title = document.getElementById(`title-${index}`).value.trim();
                 const folder = document.getElementById(`folder-${index}`).value.trim();
                 const description = document.getElementById(`desc-${index}`).value.trim();
@@ -726,10 +723,18 @@
 
                 if (!title || !folder) {
                     showNotification('標題和資料夾名稱不能為空', 'error');
-                    delete editingStates[index];
-                    renderArticles();
                     return;
                 }
+
+                // 驗證日期格式
+                const dateRegex = /^\d{4}-\d{2}-\d{2} \d{2}:\d{2}:\d{2}$/;
+                if (!dateRegex.test(date)) {
+                    showNotification('日期格式錯誤，請使用：YYYY-MM-DD HH:MM:SS', 'error');
+                    return;
+                }
+
+                editingStates[index] = true;
+                renderArticles();
 
                 articles[index].title = title;
                 articles[index].folder = folder;
