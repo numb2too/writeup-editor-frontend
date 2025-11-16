@@ -28,7 +28,12 @@
 
         <h3>📁 資料夾目錄</h3>
         <div class="search-section">
-            <input type="text" class="search-input" placeholder="快速搜尋資料夾..." v-model="folderSearch">
+            <div class="search-input-wrapper">
+                <input type="text" class="search-input" placeholder="快速搜尋資料夾..." v-model="folderSearch">
+                <button v-if="folderSearch" class="clear-search-btn" @click="clearSearch" title="清除搜尋">
+                    ✕
+                </button>
+            </div>
         </div>
 
         <div class="sort-section">
@@ -133,10 +138,63 @@ const handleAddFolder = () => {
         closeDialog()
     }
 }
+
+const clearSearch = () => {
+    folderSearch.value = ''
+}
 </script>
 
 <style scoped>
-/* 原有樣式保持不變 */
+/* 搜尋區域樣式 */
+.search-section {
+    margin-bottom: 10px;
+}
+
+.search-input-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.search-input {
+    width: 100%;
+    padding: 8px 30px 8px 10px;
+    /* 右邊留空間給 X 按鈕 */
+    border: 2px solid #ddd;
+    border-radius: 5px;
+    font-size: 0.9em;
+    transition: border-color 0.3s;
+}
+
+.search-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.clear-search-btn {
+    position: absolute;
+    right: 5px;
+    width: 24px;
+    height: 24px;
+    border: none;
+    background: #e9ecef;
+    color: #666;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+    transition: all 0.3s;
+    padding: 0;
+    line-height: 1;
+}
+
+.clear-search-btn:hover {
+    background: #ff6b6b;
+    color: white;
+    transform: rotate(90deg);
+}
 
 /* 對話框樣式 */
 .dialog-overlay {
@@ -253,7 +311,7 @@ const handleAddFolder = () => {
     cursor: not-allowed;
 }
 
-/* 其他原有樣式... */
+/* 排序區域 */
 .sort-section {
     margin-bottom: 10px;
 }
@@ -281,6 +339,37 @@ const handleAddFolder = () => {
     border-color: #667eea;
 }
 
+/* 統計區域 */
+.stats {
+    background: #f8f9ff;
+    padding: 8px 10px;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    border: 1px solid #e7e9fc;
+    display: flex;
+    justify-content: space-around;
+}
+
+.stat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    font-size: 0.85em;
+    gap: 2px;
+}
+
+.stat-label {
+    color: #666;
+    font-weight: 500;
+}
+
+.stat-value {
+    color: #667eea;
+    font-weight: 700;
+    font-size: 1.1em;
+}
+
+/* 資料夾列表 */
 .folders-list {
     max-height: calc(100vh - 380px);
     overflow-y: auto;
@@ -346,6 +435,7 @@ const handleAddFolder = () => {
     font-size: 0.85em;
 }
 
+/* 滾動條樣式 */
 .folders-list::-webkit-scrollbar {
     width: 6px;
 }

@@ -198,6 +198,7 @@ const handleAddFolder = async (folderName) => {
 .stat-label {
   font-size: 0.9em;
   opacity: 0.9;
+  color: rgb(238, 226, 226);
 }
 
 /* Tags Panel Styles */
