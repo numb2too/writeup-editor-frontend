@@ -247,6 +247,13 @@ body {
   border-top: 1px solid #eee;
 }
 
+.tools-label {
+  margin-bottom: 10px;
+  display: block;
+  color: #666;
+  font-weight: 600;
+}
+
 .tool-tag {
   display: inline-block;
   background: #e7e9fc;
@@ -278,19 +285,29 @@ body {
   position: relative;
 }
 
-.add-tag-input {
+.tag-input-wrapper {
   flex: 1;
+  position: relative;
+}
+
+.add-tag-input {
+  width: 100%;
   padding: 8px;
   border: 2px solid #ddd;
   border-radius: 5px;
   font-size: 0.9em;
 }
 
+.add-tag-input:focus {
+  outline: none;
+  border-color: #667eea;
+}
+
 .tag-suggestions {
   position: absolute;
   top: 100%;
   left: 0;
-  right: 60px;
+  right: 0;
   background: white;
   border: 2px solid #667eea;
   border-radius: 5px;
@@ -299,6 +316,7 @@ body {
   z-index: 1000;
   box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
   display: none;
+  margin-top: 5px;
 }
 
 .tag-suggestions.show {
@@ -339,6 +357,7 @@ body {
   border-radius: 5px;
   cursor: pointer;
   transition: 0.3s;
+  white-space: nowrap;
 }
 
 .add-tag-btn:hover {
@@ -380,43 +399,6 @@ body {
   background: #ff5252;
 }
 
-.notification {
-  position: fixed;
-  top: 20px;
-  right: 20px;
-  background: white;
-  padding: 15px 20px;
-  border-radius: 8px;
-  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-  display: none;
-  z-index: 1000;
-  animation: slideIn 0.3s ease;
-}
-
-.notification.show {
-  display: block;
-}
-
-.notification.success {
-  border-left: 4px solid #51cf66;
-}
-
-.notification.error {
-  border-left: 4px solid #ff6b6b;
-}
-
-@keyframes slideIn {
-  from {
-    transform: translateX(400px);
-    opacity: 0;
-  }
-
-  to {
-    transform: translateX(0);
-    opacity: 1;
-  }
-}
-
 .clear-search {
   background: #adb5bd;
   color: white;
@@ -431,4 +413,18 @@ body {
 
 .clear-search:hover {
   background: #868e96;
+}
+
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.no-results p {
+  font-size: 1.2em;
+  margin-bottom: 20px;
 }

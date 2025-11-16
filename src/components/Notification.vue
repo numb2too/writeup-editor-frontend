@@ -23,28 +23,52 @@ defineProps({
     padding: 15px 20px;
     border-radius: 8px;
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
-    z-index: 1000;
+    z-index: 9999;
+    min-width: 250px;
+    font-weight: 500;
+    font-size: 14px;
 }
 
 .notification.success {
     border-left: 4px solid #51cf66;
+    color: #2b8a3e;
 }
 
 .notification.error {
     border-left: 4px solid #ff6b6b;
+    color: #c92a2a;
 }
 
-.slide-enter-active,
+/* 過渡動畫 */
+.slide-enter-active {
+    animation: slideIn 0.3s ease-out;
+}
+
 .slide-leave-active {
-    transition: all 0.3s ease;
+    animation: slideOut 0.3s ease-in;
 }
 
-.slide-enter-from {
-    transform: translateX(400px);
-    opacity: 0;
+@keyframes slideIn {
+    from {
+        transform: translateX(400px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
 }
 
-.slide-leave-to {
-    opacity: 0;
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+
+    to {
+        transform: translateX(400px);
+        opacity: 0;
+    }
 }
 </style>

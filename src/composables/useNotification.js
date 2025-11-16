@@ -1,7 +1,7 @@
-import { ref } from 'vue'
+import { reactive } from 'vue'
 
 // 使用單例模式確保所有組件共享同一個通知狀態
-const notification = ref({
+const notification = reactive({
     show: false,
     message: '',
     type: 'success'
@@ -16,17 +16,16 @@ export function useNotification() {
             clearTimeout(timeoutId)
         }
 
-        notification.value = {
-            show: true,
-            message,
-            type
-        }
+        // 更新通知內容
+        notification.show = true
+        notification.message = message
+        notification.type = type
 
         console.log('顯示通知:', message, type) // Debug 用
 
         // 3 秒後自動隱藏
         timeoutId = setTimeout(() => {
-            notification.value.show = false
+            notification.show = false
         }, 3000)
     }
 
