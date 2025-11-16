@@ -7,7 +7,7 @@
 
       <div class="main-content">
         <Sidebar :articles="articles" :selected-folder="selectedFolder" :is-detecting="isDetecting"
-          @detect-folders="detectNewFolders" @select-folder="selectFolder" />
+          @detect-folders="detectNewFolders" @select-folder="selectFolder" @add-folder="handleAddFolder" />
 
         <div class="editor-area">
           <div v-if="!selectedFolder" class="welcome-screen">
@@ -86,7 +86,8 @@ const {
   saveArticle,
   deleteArticle,
   addTagToArticle,
-  removeTagFromArticle
+  removeTagFromArticle,
+  addNewFolder  // 新增
 } = useArticles()
 
 const { allTags } = useTags(articles)
@@ -116,6 +117,11 @@ const handleSelectTag = (tag) => {
     addTagToArticle(selectedArticle.value, tag)
     newTag.value = ''
   }
+}
+
+// 新增資料夾處理
+const handleAddFolder = async (folderName) => {
+  await addNewFolder(folderName)
 }
 </script>
 

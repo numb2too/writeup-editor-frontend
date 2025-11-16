@@ -1,10 +1,29 @@
 <template>
     <div class="sidebar">
-        <h3>🔍 偵測新文章</h3>
+        <h3>🔍 管理文章</h3>
         <div class="detect-section">
             <button class="detect-btn" @click="$emit('detect-folders')" :disabled="isDetecting">
-                {{ isDetecting ? '偵測中...' : '🔎 偵測 /writeups 資料夾' }}
+                {{ isDetecting ? '偵測中...' : '🔎 偵測資料夾' }}
             </button>
+            <button class="add-folder-btn" @click="showAddFolderDialog">
+                ➕ 新增資料夾
+            </button>
+        </div>
+
+        <!-- 新增資料夾對話框 -->
+        <div v-if="showDialog" class="dialog-overlay" @click.self="closeDialog">
+            <div class="dialog-box">
+                <h3>新增資料夾</h3>
+                <p class="dialog-hint">將在 /writeups 目錄下建立新資料夾</p>
+                <input v-model="newFolderName" type="text" class="folder-input" placeholder="請輸入資料夾名稱..."
+                    @keyup.enter="handleAddFolder" ref="folderInput">
+                <div class="dialog-actions">
+                    <button class="btn-cancel" @click="closeDialog">取消</button>
+                    <button class="btn-confirm" @click="handleAddFolder" :disabled="!newFolderName.trim()">
+                        確認新增
+                    </button>
+                </div>
+            </div>
         </div>
 
         <h3>📁 資料夾目錄</h3>
@@ -50,7 +69,7 @@
 </template>
 
 <script setup>
-import { ref, computed } from 'vue'
+import { ref, computed, nextTick } from 'vue'
 
 const props = defineProps({
     articles: Array,
@@ -58,15 +77,17 @@ const props = defineProps({
     isDetecting: Boolean
 })
 
-defineEmits(['detect-folders', 'select-folder'])
+const emit = defineEmits(['detect-folders', 'select-folder', 'add-folder'])
 
 const folderSearch = ref('')
 const sortBy = ref('date')
+const showDialog = ref(false)
+const newFolderName = ref('')
+const folderInput = ref(null)
 
 const filteredFolders = computed(() => {
     let folders = [...props.articles]
 
-    // 搜尋過濾
     if (folderSearch.value.trim()) {
         const search = folderSearch.value.toLowerCase()
         folders = folders.filter(article =>
@@ -75,7 +96,6 @@ const filteredFolders = computed(() => {
         )
     }
 
-    // 排序
     switch (sortBy.value) {
         case 'name':
             folders.sort((a, b) => a.folder.localeCompare(b.folder))
@@ -94,9 +114,146 @@ const filteredFolders = computed(() => {
 const formatDate = (dateStr) => {
     return dateStr.split(' ')[0]
 }
+
+const showAddFolderDialog = () => {
+    showDialog.value = true
+    nextTick(() => {
+        folderInput.value?.focus()
+    })
+}
+
+const closeDialog = () => {
+    showDialog.value = false
+    newFolderName.value = ''
+}
+
+const handleAddFolder = () => {
+    if (newFolderName.value.trim()) {
+        emit('add-folder', newFolderName.value.trim())
+        closeDialog()
+    }
+}
 </script>
 
 <style scoped>
+/* 原有樣式保持不變 */
+
+/* 對話框樣式 */
+.dialog-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 9999;
+    animation: fadeIn 0.2s;
+}
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+    }
+
+    to {
+        opacity: 1;
+    }
+}
+
+.dialog-box {
+    background: white;
+    border-radius: 12px;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+    animation: slideUp 0.3s;
+}
+
+@keyframes slideUp {
+    from {
+        transform: translateY(20px);
+        opacity: 0;
+    }
+
+    to {
+        transform: translateY(0);
+        opacity: 1;
+    }
+}
+
+.dialog-box h3 {
+    color: #667eea;
+    margin: 0 0 10px 0;
+    font-size: 1.3em;
+}
+
+.dialog-hint {
+    color: #999;
+    font-size: 0.85em;
+    margin-bottom: 15px;
+}
+
+.folder-input {
+    width: 100%;
+    padding: 12px;
+    border: 2px solid #ddd;
+    border-radius: 6px;
+    font-size: 0.95em;
+    margin-bottom: 20px;
+    transition: border-color 0.3s;
+}
+
+.folder-input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.dialog-actions {
+    display: flex;
+    gap: 10px;
+}
+
+.btn-cancel,
+.btn-confirm {
+    flex: 1;
+    padding: 10px;
+    border: none;
+    border-radius: 6px;
+    font-size: 0.9em;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+}
+
+.btn-cancel {
+    background: #f1f3f5;
+    color: #666;
+}
+
+.btn-cancel:hover {
+    background: #e9ecef;
+}
+
+.btn-confirm {
+    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    color: white;
+}
+
+.btn-confirm:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(102, 126, 234, 0.3);
+}
+
+.btn-confirm:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* 其他原有樣式... */
 .sort-section {
     margin-bottom: 10px;
 }
@@ -189,7 +346,6 @@ const formatDate = (dateStr) => {
     font-size: 0.85em;
 }
 
-/* 滾動條樣式 */
 .folders-list::-webkit-scrollbar {
     width: 6px;
 }

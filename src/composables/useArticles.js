@@ -149,6 +149,31 @@ export function useArticles() {
       String(now.getSeconds()).padStart(2, '0')
   }
 
+  const addNewFolder = async (folderName) => {
+    try {
+      const result = await api.createFolder(folderName)
+
+      if (result.success) {
+        // 新增文章到列表
+        const newArticle = {
+          title: folderName,
+          description: folderName,
+          tools: ['knowledge', folderName],
+          date: getCurrentDate(),
+          folder: folderName,
+          platform: 'knowledge'
+        }
+        articles.value.unshift(newArticle)
+
+        // 儲存到 JSON
+        await api.saveToJson(articles.value)
+        showNotification(`✅ 成功建立資料夾「${folderName}」`, 'success')
+      }
+    } catch (error) {
+      showNotification('❌ 建立資料夾失敗: ' + error.message, 'error')
+    }
+  }
+
   onMounted(loadArticles)
 
   return {
@@ -163,6 +188,7 @@ export function useArticles() {
     deleteArticle,
     addTagToArticle,
     removeTagFromArticle,
+    addNewFolder,  // 新增
     clearSearch,
     filterByTag
   }

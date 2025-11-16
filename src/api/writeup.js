@@ -27,3 +27,14 @@ export async function detectNewFolders() {
     if (!result.success) throw new Error(result.message)
     return result
 }
+
+export async function createFolder(folderName) {
+    const response = await fetch(`${API_BASE_URL}/api/createFolder`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ folderName })
+    })
+    const result = await response.json()
+    if (!result.success) throw new Error(result.message)
+    return result
+}

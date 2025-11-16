@@ -68,19 +68,26 @@ body {
 
 .detect-section {
   margin-bottom: 12px;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 8px;
 }
 
-.detect-btn {
+.detect-btn,
+.add-folder-btn {
   width: 100%;
-  padding: 10px;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  padding: 10px 8px;
   color: white;
   border: none;
   border-radius: 6px;
   cursor: pointer;
-  font-size: 0.9em;
+  font-size: 0.85em;
   font-weight: 600;
   transition: all 0.3s;
+}
+
+.detect-btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
 }
 
 .detect-btn:hover:not(:disabled) {
@@ -91,6 +98,15 @@ body {
 .detect-btn:disabled {
   opacity: 0.6;
   cursor: not-allowed;
+}
+
+.add-folder-btn {
+  background: linear-gradient(135deg, #51cf66 0%, #37b24d 100%);
+}
+
+.add-folder-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 5px 15px rgba(81, 207, 102, 0.3);
 }
 
 .search-section {
