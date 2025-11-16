@@ -47,22 +47,7 @@
             <!-- 第三行：描述（全寬） -->
             <div class="edit-field field-full">
                 <label>描述:</label>
-                <textarea v-model="formData.description"></textarea>
-            </div>
-
-            <!-- 標籤區域 -->
-            <div class="article-tools">
-                <label class="tools-label">🏷️ 標籤 (點擊刪除):</label>
-                <span v-for="tool in article.tools" :key="tool" class="tool-tag"
-                    @click="$emit('remove-tag', article, tool)">
-                    {{ tool }}
-                </span>
-
-                <div class="add-tag-section">
-                    <TagSuggestions v-model="newTag" :all-tags="allTags" :current-tags="article.tools"
-                        @select="handleSelectTag" />
-                    <button class="add-tag-btn" @click="handleAddTag">+ 新增</button>
-                </div>
+                <textarea v-model="formData.description" rows="6"></textarea>
             </div>
         </div>
 
@@ -74,17 +59,13 @@
 </template>
 
 <script setup>
-import { ref, reactive, computed } from 'vue'
-import TagSuggestions from './TagSuggestions.vue'
+import { reactive, computed } from 'vue'
 
 const props = defineProps({
-    article: Object,
-    allTags: Object
+    article: Object
 })
 
-const emit = defineEmits(['save', 'delete', 'add-tag', 'remove-tag', 'close'])
-
-const newTag = ref('')
+const emit = defineEmits(['save', 'delete', 'close'])
 
 const formData = reactive({
     title: props.article.title,
@@ -105,21 +86,10 @@ const handleSave = () => {
 const handleDelete = () => {
     emit('delete', props.article)
 }
-
-const handleAddTag = () => {
-    if (newTag.value.trim()) {
-        emit('add-tag', props.article, newTag.value.trim())
-        newTag.value = ''
-    }
-}
-
-const handleSelectTag = (tag) => {
-    emit('add-tag', props.article, tag)
-    newTag.value = ''
-}
 </script>
 
 <style scoped>
+/* 保持原有的樣式，只需移除 article-tools 相關的樣式 */
 .article-card {
     height: 100%;
     display: flex;

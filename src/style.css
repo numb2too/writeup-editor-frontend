@@ -39,7 +39,7 @@ body {
 .main-content {
   flex: 1;
   display: grid;
-  grid-template-columns: 320px 1fr;
+  grid-template-columns: 320px 1fr 400px;
   gap: 15px;
   padding: 15px;
   overflow: hidden;
@@ -150,6 +150,18 @@ body {
   flex-direction: column;
   height: 100%;
   padding: 20px;
+}
+
+/* ==================== Tags Panel ==================== */
+.tags-panel {
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 20px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 /* ArticleCard 內部滾動處理 */
