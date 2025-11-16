@@ -34,16 +34,7 @@
         <div class="tags-panel" v-if="selectedArticle">
           <h3 class="tags-panel-title">🏷️ 標籤管理</h3>
 
-          <div class="current-tags-section">
-            <label class="section-label">當前標籤 (點擊刪除):</label>
-            <div class="tags-container">
-              <span v-for="tool in selectedArticle.tools" :key="tool" class="tool-tag"
-                @click="removeTagFromArticle(selectedArticle, tool)">
-                {{ tool }}
-              </span>
-            </div>
-          </div>
-
+          <!-- 新增標籤區域 (20% 高度) -->
           <div class="add-tag-section-panel">
             <label class="section-label">新增標籤:</label>
             <TagSuggestions v-model="newTag" :all-tags="allTags" :current-tags="selectedArticle.tools"
@@ -51,28 +42,25 @@
             <button class="add-tag-btn-panel" @click="handleAddTag">+ 新增標籤</button>
           </div>
 
-          <div class="all-tags-section">
-            <label class="section-label">所有標籤 ({{ Object.keys(allTags).length }}):</label>
-            <div class="all-tags-list">
-              <div v-for="[tag, count] in sortedAllTags" :key="tag" class="all-tag-item" @click="handleSelectTag(tag)">
-                <span class="tag-name">{{ tag }}</span>
-                <span class="tag-count">{{ count }}</span>
-              </div>
+          <!-- 當前標籤區域 (80% 高度) -->
+          <div class="current-tags-section">
+            <label class="section-label">當前標籤 ({{ selectedArticle.tools.length }}) - 點擊刪除:</label>
+            <div class="tags-container-scrollable">
+              <span v-for="tool in selectedArticle.tools" :key="tool" class="tool-tag"
+                @click="removeTagFromArticle(selectedArticle, tool)">
+                {{ tool }}
+              </span>
             </div>
           </div>
         </div>
 
-        <!-- 當沒有選擇文章時，顯示所有標籤統計 -->
+        <!-- 當沒有選擇文章時的提示 -->
         <div class="tags-panel" v-else>
-          <h3 class="tags-panel-title">🏷️ 標籤統計</h3>
-          <div class="all-tags-section">
-            <label class="section-label">所有標籤 ({{ Object.keys(allTags).length }}):</label>
-            <div class="all-tags-list">
-              <div v-for="[tag, count] in sortedAllTags" :key="tag" class="all-tag-item-readonly">
-                <span class="tag-name">{{ tag }}</span>
-                <span class="tag-count">{{ count }}</span>
-              </div>
-            </div>
+          <h3 class="tags-panel-title">🏷️ 標籤管理</h3>
+          <div class="empty-state">
+            <div class="empty-icon">🏷️</div>
+            <p>請先選擇一個資料夾</p>
+            <p class="empty-hint">選擇後即可管理標籤</p>
           </div>
         </div>
       </div>
@@ -110,10 +98,6 @@ const newTag = ref('')
 const selectedArticle = computed(() => {
   if (!selectedFolder.value) return null
   return articles.value.find(a => a.folder === selectedFolder.value)
-})
-
-const sortedAllTags = computed(() => {
-  return Object.entries(allTags.value).sort((a, b) => b[1] - a[1])
 })
 
 const selectFolder = (folder) => {
@@ -214,15 +198,16 @@ const handleSelectTag = (tag) => {
 .tags-panel {
   display: flex;
   flex-direction: column;
-  gap: 15px;
+  height: 100%;
 }
 
 .tags-panel-title {
   color: #667eea;
   font-size: 1.2em;
-  margin: 0;
+  margin: 0 0 15px 0;
   padding-bottom: 12px;
   border-bottom: 2px solid #e7e9fc;
+  flex-shrink: 0;
 }
 
 .section-label {
@@ -233,36 +218,7 @@ const handleSelectTag = (tag) => {
   font-weight: 600;
 }
 
-.current-tags-section {
-  padding: 15px;
-  background: #f8f9ff;
-  border-radius: 8px;
-  border: 2px solid #e7e9fc;
-}
-
-.tags-container {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 6px;
-}
-
-.tool-tag {
-  display: inline-block;
-  background: #e7e9fc;
-  color: #667eea;
-  padding: 5px 10px;
-  border-radius: 15px;
-  font-size: 0.85em;
-  cursor: pointer;
-  transition: all 0.3s;
-}
-
-.tool-tag:hover {
-  background: #ff6b6b;
-  color: white;
-  transform: translateY(-2px);
-}
-
+/* 新增標籤區域 - 固定高度約 20% */
 .add-tag-section-panel {
   padding: 15px;
   background: #f8f9ff;
@@ -271,6 +227,8 @@ const handleSelectTag = (tag) => {
   display: flex;
   flex-direction: column;
   gap: 10px;
+  flex-shrink: 0;
+  margin-bottom: 15px;
 }
 
 .add-tag-btn-panel {
@@ -291,82 +249,90 @@ const handleSelectTag = (tag) => {
   transform: translateY(-2px);
 }
 
-.all-tags-section {
-  flex: 1;
+/* 當前標籤區域 - 佔據剩餘空間約 80% */
+.current-tags-section {
+  padding: 15px;
+  background: #f8f9ff;
+  border-radius: 8px;
+  border: 2px solid #e7e9fc;
   display: flex;
   flex-direction: column;
+  flex: 1;
+  min-height: 0;
   overflow: hidden;
 }
 
-.all-tags-list {
-  flex: 1;
+.tags-container-scrollable {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
   overflow-y: auto;
   padding-right: 5px;
+  align-content: flex-start;
 }
 
-.all-tag-item,
-.all-tag-item-readonly {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 8px 12px;
-  margin-bottom: 6px;
-  background: #f8f9ff;
-  border: 2px solid #e7e9fc;
-  border-radius: 6px;
-  transition: all 0.3s;
-}
-
-.all-tag-item {
-  cursor: pointer;
-}
-
-.all-tag-item:hover {
-  border-color: #667eea;
-  background: #667eea;
-  color: white;
-  transform: translateX(3px);
-}
-
-.all-tag-item:hover .tag-count {
-  background: rgba(255, 255, 255, 0.3);
-  color: white;
-}
-
-.all-tag-item-readonly {
-  cursor: default;
-}
-
-.tag-name {
-  font-size: 0.9em;
-  font-weight: 500;
-}
-
-.tag-count {
+.tool-tag {
+  display: inline-block;
   background: #e7e9fc;
   color: #667eea;
-  padding: 2px 8px;
-  border-radius: 10px;
-  font-size: 0.8em;
-  font-weight: 600;
+  padding: 6px 12px;
+  border-radius: 15px;
+  font-size: 0.85em;
+  cursor: pointer;
+  transition: all 0.3s;
+  flex-shrink: 0;
+  height: fit-content;
 }
 
-.all-tags-list::-webkit-scrollbar {
+.tool-tag:hover {
+  background: #ff6b6b;
+  color: white;
+  transform: translateY(-2px);
+}
+
+.tags-container-scrollable::-webkit-scrollbar {
   width: 6px;
 }
 
-.all-tags-list::-webkit-scrollbar-track {
+.tags-container-scrollable::-webkit-scrollbar-track {
   background: #f1f1f1;
   border-radius: 3px;
 }
 
-.all-tags-list::-webkit-scrollbar-thumb {
+.tags-container-scrollable::-webkit-scrollbar-thumb {
   background: #667eea;
   border-radius: 3px;
 }
 
-.all-tags-list::-webkit-scrollbar-thumb:hover {
+.tags-container-scrollable::-webkit-scrollbar-thumb:hover {
   background: #5568d3;
+}
+
+/* 空狀態樣式 */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+  color: #999;
+  text-align: center;
+}
+
+.empty-icon {
+  font-size: 4em;
+  margin-bottom: 15px;
+  opacity: 0.5;
+}
+
+.empty-state p {
+  margin: 5px 0;
+  font-size: 1.1em;
+}
+
+.empty-hint {
+  font-size: 0.9em !important;
+  color: #bbb;
 }
 
 @media (max-width: 1400px) {

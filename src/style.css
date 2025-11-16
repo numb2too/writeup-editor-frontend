@@ -162,6 +162,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  gap: 0;
 }
 
 /* ArticleCard 內部滾動處理 */
