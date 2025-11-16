@@ -143,8 +143,10 @@ body {
 .stat-item {
   display: flex;
   justify-content: space-between;
+  align-items: center;
   margin-bottom: 8px;
   font-size: 0.9em;
+  flex-wrap: wrap;
 }
 
 .stat-label {
@@ -154,6 +156,12 @@ body {
 .stat-value {
   font-weight: 600;
   color: #667eea;
+}
+
+.stat-hint {
+  font-size: 0.85em;
+  color: #999;
+  margin-left: 5px;
 }
 
 .articles-grid {

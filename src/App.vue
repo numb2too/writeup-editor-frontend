@@ -6,8 +6,8 @@
       <Header />
 
       <div class="main-content">
-        <Sidebar :articles="articles" :filtered-count="filteredArticles.length" :search-text="searchText"
-          :all-tags="allTags" :active-filter="activeFilter" :is-detecting="isDetecting"
+        <Sidebar :articles="articles" :filtered-count="displayArticles.length" :total-filtered="filteredArticles.length"
+          :search-text="searchText" :all-tags="allTags" :active-filter="activeFilter" :is-detecting="isDetecting"
           @update:search="searchText = $event" @clear-search="clearSearch" @filter-by-tag="filterByTag"
           @detect-folders="detectNewFolders" />
 
@@ -18,6 +18,11 @@
           <div v-if="filteredArticles.length === 0" class="no-results">
             <p>😔 沒有找到符合條件的文章</p>
             <button @click="clearSearch" class="btn btn-save">清除搜尋</button>
+          </div>
+
+          <div v-else-if="filteredArticles.length > 6" class="load-more-hint">
+            <p>📋 還有 {{ filteredArticles.length - 6 }} 筆文章未顯示</p>
+            <p class="hint-text">請使用搜尋或標籤篩選來查找特定文章</p>
           </div>
         </div>
       </div>
