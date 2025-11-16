@@ -1,30 +1,50 @@
-<script setup lang="ts">
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <div>
-    <a href="https://vite.dev" target="_blank">
-      <img src="/vite.svg" class="logo" alt="Vite logo" />
-    </a>
-    <a href="https://vuejs.org/" target="_blank">
-      <img src="./assets/vue.svg" class="logo vue" alt="Vue logo" />
-    </a>
+  <div class="app-container">
+    <Notification :message="notification.message" :type="notification.type" :show="notification.show" />
+
+    <div class="container">
+      <Header />
+
+      <div class="main-content">
+        <Sidebar :articles="articles" :filtered-count="filteredArticles.length" :search-text="searchText"
+          :all-tags="allTags" :active-filter="activeFilter" @update:search="searchText = $event"
+          @clear-search="clearSearch" @filter-by-tag="filterByTag" @detect-folders="detectNewFolders" />
+
+        <div class="articles-grid">
+          <ArticleCard v-for="article in displayArticles" :key="article.folder" :article="article" :all-tags="allTags"
+            @save="saveArticle" @delete="deleteArticle" @add-tag="addTagToArticle" @remove-tag="removeTagFromArticle" />
+        </div>
+      </div>
+    </div>
   </div>
-  <HelloWorld msg="Vite + Vue" />
 </template>
 
-<style scoped>
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.vue:hover {
-  filter: drop-shadow(0 0 2em #42b883aa);
-}
-</style>
+<script setup>
+import { computed } from 'vue'
+import Header from './components/Header.vue'
+import Sidebar from './components/Sidebar.vue'
+import ArticleCard from './components/ArticleCard.vue'
+import Notification from './components/Notification.vue'
+import { useArticles } from './composables/useArticles'
+import { useTags } from './composables/useTags'
+import { useNotification } from './composables/useNotification'
+
+const {
+  articles,
+  searchText,
+  activeFilter,
+  filteredArticles,
+  detectNewFolders,
+  saveArticle,
+  deleteArticle,
+  addTagToArticle,
+  removeTagFromArticle,
+  clearSearch,
+  filterByTag
+} = useArticles()
+
+const { allTags } = useTags(articles)
+const { notification } = useNotification()
+
+const displayArticles = computed(() => filteredArticles.value.slice(0, 6))
+</script>
