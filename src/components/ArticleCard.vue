@@ -18,48 +18,51 @@
             </div>
         </div>
 
-        <div class="edit-field">
-            <label>標題:</label>
-            <input v-model="formData.title" type="text">
-        </div>
+        <!-- 可滾動的內容區域 -->
+        <div class="article-card-content">
+            <div class="edit-field">
+                <label>標題:</label>
+                <input v-model="formData.title" type="text">
+            </div>
 
-        <div class="edit-field">
-            <label>資料夾名稱:</label>
-            <input v-model="formData.folder" type="text">
-        </div>
+            <div class="edit-field">
+                <label>資料夾名稱:</label>
+                <input v-model="formData.folder" type="text">
+            </div>
 
-        <div class="edit-field">
-            <label>描述:</label>
-            <textarea v-model="formData.description"></textarea>
-        </div>
+            <div class="edit-field">
+                <label>描述:</label>
+                <textarea v-model="formData.description"></textarea>
+            </div>
 
-        <div class="edit-field">
-            <label>平台:</label>
-            <input v-model="formData.platform" type="text">
-        </div>
+            <div class="edit-field">
+                <label>平台:</label>
+                <input v-model="formData.platform" type="text">
+            </div>
 
-        <div class="edit-field">
-            <label>日期時間 (格式: YYYY-MM-DD HH:MM:SS):</label>
-            <input v-model="formData.date" type="text" placeholder="2025-11-16 14:30:00">
-        </div>
+            <div class="edit-field">
+                <label>日期時間 (格式: YYYY-MM-DD HH:MM:SS):</label>
+                <input v-model="formData.date" type="text" placeholder="2025-11-16 14:30:00">
+            </div>
 
-        <div class="article-tools">
-            <label class="tools-label">🏷️ 標籤 (點擊刪除):</label>
-            <span v-for="tool in article.tools" :key="tool" class="tool-tag"
-                @click="$emit('remove-tag', article, tool)">
-                {{ tool }}
-            </span>
+            <div class="article-tools">
+                <label class="tools-label">🏷️ 標籤 (點擊刪除):</label>
+                <span v-for="tool in article.tools" :key="tool" class="tool-tag"
+                    @click="$emit('remove-tag', article, tool)">
+                    {{ tool }}
+                </span>
 
-            <div class="add-tag-section">
-                <TagSuggestions v-model="newTag" :all-tags="allTags" :current-tags="article.tools"
-                    @select="handleSelectTag" />
-                <button class="add-tag-btn" @click="handleAddTag">+ 新增</button>
+                <div class="add-tag-section">
+                    <TagSuggestions v-model="newTag" :all-tags="allTags" :current-tags="article.tools"
+                        @select="handleSelectTag" />
+                    <button class="add-tag-btn" @click="handleAddTag">+ 新增</button>
+                </div>
             </div>
         </div>
 
         <div class="action-buttons">
             <button class="btn btn-save" @click="handleSave">💾 儲存修改</button>
-            <button class="btn btn-delete" @click="handleDelete">🗑️ 刪除</button>
+            <button class="btn btn-delete" @click="handleDelete">🗑️刪除</button>
         </div>
     </div>
 </template>
@@ -313,5 +316,24 @@ const handleSelectTag = (tag) => {
     background: #ff5252;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
+}
+
+.article-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.card-header,
+.article-header,
+.action-buttons {
+    flex-shrink: 0;
+}
+
+.article-card-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 </style>
