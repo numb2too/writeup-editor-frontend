@@ -45,19 +45,18 @@
 </template>
 
 <script setup>
-import { computed, ref } from 'vue'
+import { computed } from 'vue'
 
 const props = defineProps({
     articles: Array,
     filteredCount: Number,
     searchText: String,
     allTags: Object,
-    activeFilter: String
+    activeFilter: String,
+    isDetecting: Boolean
 })
 
 defineEmits(['update:search', 'clear-search', 'filter-by-tag', 'detect-folders'])
-
-const isDetecting = ref(false)
 
 const sortedTags = computed(() => {
     return Object.entries(props.allTags).sort((a, b) => b[1] - a[1])

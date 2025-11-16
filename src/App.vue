@@ -7,12 +7,18 @@
 
       <div class="main-content">
         <Sidebar :articles="articles" :filtered-count="filteredArticles.length" :search-text="searchText"
-          :all-tags="allTags" :active-filter="activeFilter" @update:search="searchText = $event"
-          @clear-search="clearSearch" @filter-by-tag="filterByTag" @detect-folders="detectNewFolders" />
+          :all-tags="allTags" :active-filter="activeFilter" :is-detecting="isDetecting"
+          @update:search="searchText = $event" @clear-search="clearSearch" @filter-by-tag="filterByTag"
+          @detect-folders="detectNewFolders" />
 
         <div class="articles-grid">
           <ArticleCard v-for="article in displayArticles" :key="article.folder" :article="article" :all-tags="allTags"
             @save="saveArticle" @delete="deleteArticle" @add-tag="addTagToArticle" @remove-tag="removeTagFromArticle" />
+
+          <div v-if="filteredArticles.length === 0" class="no-results">
+            <p>😔 沒有找到符合條件的文章</p>
+            <button @click="clearSearch" class="btn btn-save">清除搜尋</button>
+          </div>
         </div>
       </div>
     </div>
@@ -34,6 +40,7 @@ const {
   searchText,
   activeFilter,
   filteredArticles,
+  isDetecting,
   detectNewFolders,
   saveArticle,
   deleteArticle,
@@ -48,3 +55,19 @@ const { notification } = useNotification()
 
 const displayArticles = computed(() => filteredArticles.value.slice(0, 6))
 </script>
+
+<style>
+.no-results {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+  background: #f8f9fa;
+  border-radius: 10px;
+  margin-top: 20px;
+}
+
+.no-results p {
+  font-size: 1.2em;
+  margin-bottom: 20px;
+}
+</style>
