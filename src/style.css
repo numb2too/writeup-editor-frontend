@@ -41,7 +41,7 @@ body {
   display: grid;
   grid-template-columns: 320px 1fr;
   gap: 15px;
-  padding: 15px 20px;
+  padding: 15px;
   overflow: hidden;
   max-height: calc(100vh - 100px);
   /* 減去 header 高度 */
@@ -149,6 +149,7 @@ body {
   display: flex;
   flex-direction: column;
   height: 100%;
+  padding: 20px;
 }
 
 /* ArticleCard 內部滾動處理 */
@@ -156,6 +157,25 @@ body {
   flex: 1;
   overflow-y: auto;
   padding-right: 5px;
+}
+
+/* 欄位並排佈局 */
+.fields-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.fields-row-three {
+  display: grid;
+  grid-template-columns: 2fr 1fr 2fr;
+  gap: 15px;
+  margin-bottom: 15px;
+}
+
+.field-full {
+  grid-column: 1 / -1;
 }
 
 .article-card-content::-webkit-scrollbar {

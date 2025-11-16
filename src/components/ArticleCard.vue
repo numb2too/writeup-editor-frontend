@@ -20,31 +20,37 @@
 
         <!-- 可滾動的內容區域 -->
         <div class="article-card-content">
-            <div class="edit-field">
-                <label>標題:</label>
-                <input v-model="formData.title" type="text">
+            <!-- 第一行：標題 + 資料夾 -->
+            <div class="fields-row">
+                <div class="edit-field">
+                    <label>標題:</label>
+                    <input v-model="formData.title" type="text">
+                </div>
+                <div class="edit-field">
+                    <label>資料夾名稱:</label>
+                    <input v-model="formData.folder" type="text">
+                </div>
             </div>
 
-            <div class="edit-field">
-                <label>資料夾名稱:</label>
-                <input v-model="formData.folder" type="text">
+            <!-- 第二行：平台 + 日期時間 -->
+            <div class="fields-row">
+                <div class="edit-field">
+                    <label>平台:</label>
+                    <input v-model="formData.platform" type="text">
+                </div>
+                <div class="edit-field">
+                    <label>日期時間 (格式: YYYY-MM-DD HH:MM:SS):</label>
+                    <input v-model="formData.date" type="text" placeholder="2025-11-16 14:30:00">
+                </div>
             </div>
 
-            <div class="edit-field">
+            <!-- 第三行：描述（全寬） -->
+            <div class="edit-field field-full">
                 <label>描述:</label>
                 <textarea v-model="formData.description"></textarea>
             </div>
 
-            <div class="edit-field">
-                <label>平台:</label>
-                <input v-model="formData.platform" type="text">
-            </div>
-
-            <div class="edit-field">
-                <label>日期時間 (格式: YYYY-MM-DD HH:MM:SS):</label>
-                <input v-model="formData.date" type="text" placeholder="2025-11-16 14:30:00">
-            </div>
-
+            <!-- 標籤區域 -->
             <div class="article-tools">
                 <label class="tools-label">🏷️ 標籤 (點擊刪除):</label>
                 <span v-for="tool in article.tools" :key="tool" class="tool-tag"
@@ -62,7 +68,7 @@
 
         <div class="action-buttons">
             <button class="btn btn-save" @click="handleSave">💾 儲存修改</button>
-            <button class="btn btn-delete" @click="handleDelete">🗑️刪除</button>
+            <button class="btn btn-delete" @click="handleDelete">🗑️ 刪除</button>
         </div>
     </div>
 </template>
@@ -114,19 +120,23 @@ const handleSelectTag = (tag) => {
 </script>
 
 <style scoped>
-article-card {
+.article-card {
     height: 100%;
     display: flex;
     flex-direction: column;
     overflow: hidden;
-    background: white;
-    border: 2px solid #e7e9fc;
-    border-radius: 10px;
-    padding: 20px;
-    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-    max-width: 100%;
-    /* 改為 100% */
-    margin: 0;
+}
+
+.card-header,
+.article-header,
+.action-buttons {
+    flex-shrink: 0;
+}
+
+.article-card-content {
+    flex: 1;
+    overflow-y: auto;
+    padding-right: 5px;
 }
 
 .card-header {
@@ -136,7 +146,6 @@ article-card {
     margin-bottom: 15px;
     padding-bottom: 12px;
     border-bottom: 2px solid #e7e9fc;
-    flex-shrink: 0;
 }
 
 .card-title {
@@ -170,14 +179,14 @@ article-card {
     display: flex;
     justify-content: space-between;
     align-items: start;
-    margin-bottom: 20px;
-    padding: 15px;
+    margin-bottom: 15px;
+    padding: 12px;
     background: #f8f9fa;
     border-radius: 8px;
 }
 
 .article-title-display {
-    font-size: 1.3em;
+    font-size: 1.2em;
     color: #333;
     font-weight: 600;
     margin-bottom: 5px;
@@ -198,31 +207,43 @@ article-card {
     font-size: 0.75em;
 }
 
-.edit-field {
+.fields-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
     margin-bottom: 15px;
+}
+
+.edit-field {
+    display: flex;
+    flex-direction: column;
+}
+
+.field-full {
+    grid-column: 1 / -1;
 }
 
 .edit-field label {
     display: block;
     margin-bottom: 5px;
     color: #666;
-    font-size: 0.9em;
+    font-size: 0.85em;
     font-weight: 600;
 }
 
 .edit-field input,
 .edit-field textarea {
     width: 100%;
-    padding: 10px;
+    padding: 8px 10px;
     border: 2px solid #ddd;
     border-radius: 5px;
-    font-size: 0.95em;
+    font-size: 0.9em;
     transition: border-color 0.3s;
 }
 
 .edit-field textarea {
     resize: vertical;
-    min-height: 80px;
+    min-height: 60px;
     font-family: inherit;
 }
 
@@ -233,8 +254,8 @@ article-card {
 }
 
 .article-tools {
-    margin-top: 20px;
-    padding-top: 20px;
+    margin-top: 15px;
+    padding-top: 15px;
     border-top: 2px solid #eee;
 }
 
@@ -243,16 +264,17 @@ article-card {
     margin-bottom: 10px;
     color: #666;
     font-weight: 600;
+    font-size: 0.9em;
 }
 
 .tool-tag {
     display: inline-block;
     background: #e7e9fc;
     color: #667eea;
-    padding: 6px 12px;
+    padding: 5px 10px;
     margin: 4px;
     border-radius: 15px;
-    font-size: 0.9em;
+    font-size: 0.85em;
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -264,13 +286,13 @@ article-card {
 }
 
 .add-tag-section {
-    margin-top: 15px;
+    margin-top: 12px;
     display: flex;
     gap: 10px;
 }
 
 .add-tag-btn {
-    padding: 10px 20px;
+    padding: 8px 16px;
     background: #667eea;
     color: white;
     border: none;
@@ -279,6 +301,7 @@ article-card {
     transition: 0.3s;
     white-space: nowrap;
     font-weight: 600;
+    font-size: 0.9em;
 }
 
 .add-tag-btn:hover {
@@ -287,16 +310,18 @@ article-card {
 
 .action-buttons {
     display: flex;
-    gap: 15px;
-    margin-top: 25px;
+    gap: 12px;
+    margin-top: 15px;
+    padding-top: 15px;
+    border-top: 2px solid #eee;
 }
 
 .btn {
-    padding: 12px 24px;
+    padding: 10px 20px;
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    font-size: 1em;
+    font-size: 0.95em;
     transition: all 0.3s;
     font-weight: 600;
 }
@@ -322,24 +347,5 @@ article-card {
     background: #ff5252;
     transform: translateY(-2px);
     box-shadow: 0 5px 15px rgba(255, 107, 107, 0.3);
-}
-
-.article-card {
-    height: 100%;
-    display: flex;
-    flex-direction: column;
-    overflow: hidden;
-}
-
-.card-header,
-.article-header,
-.action-buttons {
-    flex-shrink: 0;
-}
-
-.article-card-content {
-    flex: 1;
-    overflow-y: auto;
-    padding-right: 5px;
 }
 </style>
