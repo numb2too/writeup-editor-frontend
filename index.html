@@ -165,7 +165,8 @@
         }
 
         .articles-grid {
-            display: grid;
+            display: flex;
+            flex-direction: column;
             gap: 20px;
         }
 
@@ -662,7 +663,7 @@
                             ${article.platform ? `<span class="platform-badge">${article.platform}</span>` : ''}
                         </div>
                         <div class="article-meta">
-                            <div>📅 ${article.date}</div>
+                            <div>📅 ${article.date.split(' ')[0]}</div>
                             <div>📁 ${article.folder}</div>
                         </div>
                     </div>
@@ -688,8 +689,8 @@
                     </div>
                     
                     <div class="edit-field">
-                        <label>日期時間:</label>
-                        <input type="datetime-local" id="date-${originalIndex}" value="${article.date.replace(' ', 'T')}">
+                        <label>日期時間 (格式: YYYY-MM-DD HH:MM:SS):</label>
+                        <input type="text" id="date-${originalIndex}" value="${article.date}" placeholder="2025-11-16 14:30:00">
                     </div>
                     
                     <div class="article-tools">
@@ -721,8 +722,7 @@
                 const folder = document.getElementById(`folder-${index}`).value.trim();
                 const description = document.getElementById(`desc-${index}`).value.trim();
                 const platform = document.getElementById(`platform-${index}`).value.trim();
-                const dateTimeValue = document.getElementById(`date-${index}`).value;
-                const date = dateTimeValue.replace('T', ' '); // 轉換回 YYYY-MM-DD HH:MM:SS 格式
+                const date = document.getElementById(`date-${index}`).value.trim();
 
                 if (!title || !folder) {
                     showNotification('標題和資料夾名稱不能為空', 'error');
