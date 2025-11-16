@@ -1,7 +1,6 @@
 <template>
   <div class="header">
-    <h1>📝 Writeups JSON 編輯器</h1>
-    <p>自動偵測新資料夾並即時儲存修改</p>
+    <h1>📝 Writeups 編輯器</h1>
   </div>
 </template>
 
@@ -9,12 +8,12 @@
 .header {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
   color: white;
-  padding: 30px;
+  padding: 15px 30px;
   text-align: center;
 }
 
 .header h1 {
-  font-size: 2em;
-  margin-bottom: 10px;
+  font-size: 1.5em;
+  margin: 0;
 }
 </style>

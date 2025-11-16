@@ -98,23 +98,23 @@ const formatDate = (dateStr) => {
 
 <style scoped>
 .sort-section {
-    margin-bottom: 15px;
+    margin-bottom: 10px;
 }
 
 .sort-section label {
     display: block;
-    margin-bottom: 5px;
+    margin-bottom: 4px;
     color: #666;
-    font-size: 0.9em;
+    font-size: 0.85em;
     font-weight: 600;
 }
 
 .sort-select {
     width: 100%;
-    padding: 8px;
+    padding: 6px 8px;
     border: 2px solid #ddd;
     border-radius: 5px;
-    font-size: 0.9em;
+    font-size: 0.85em;
     background: white;
     cursor: pointer;
 }
@@ -125,19 +125,19 @@ const formatDate = (dateStr) => {
 }
 
 .folders-list {
-    max-height: calc(100vh - 500px);
+    max-height: calc(100vh - 380px);
     overflow-y: auto;
-    margin-top: 15px;
+    margin-top: 10px;
 }
 
 .folder-item {
     display: flex;
     align-items: center;
-    padding: 12px;
-    margin-bottom: 8px;
+    padding: 8px 10px;
+    margin-bottom: 6px;
     background: white;
     border: 2px solid #e7e9fc;
-    border-radius: 8px;
+    border-radius: 6px;
     cursor: pointer;
     transition: all 0.3s;
 }
@@ -145,7 +145,7 @@ const formatDate = (dateStr) => {
 .folder-item:hover {
     border-color: #667eea;
     background: #f8f9ff;
-    transform: translateX(5px);
+    transform: translateX(3px);
 }
 
 .folder-item.active {
@@ -159,8 +159,8 @@ const formatDate = (dateStr) => {
 }
 
 .folder-icon {
-    font-size: 1.5em;
-    margin-right: 12px;
+    font-size: 1.3em;
+    margin-right: 10px;
 }
 
 .folder-info {
@@ -170,23 +170,23 @@ const formatDate = (dateStr) => {
 
 .folder-name {
     font-weight: 600;
-    font-size: 0.95em;
+    font-size: 0.9em;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
 }
 
 .folder-date {
-    font-size: 0.75em;
+    font-size: 0.7em;
     color: #999;
-    margin-top: 3px;
+    margin-top: 2px;
 }
 
 .no-folders {
     text-align: center;
-    padding: 30px 20px;
+    padding: 20px;
     color: #999;
-    font-size: 0.9em;
+    font-size: 0.85em;
 }
 
 /* 滾動條樣式 */

@@ -114,28 +114,34 @@ const handleSelectTag = (tag) => {
 </script>
 
 <style scoped>
-.article-card {
+article-card {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
     background: white;
     border: 2px solid #e7e9fc;
     border-radius: 10px;
     padding: 20px;
-    max-width: 900px;
-    margin: 0 auto;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+    max-width: 100%;
+    /* 改為 100% */
+    margin: 0;
 }
 
 .card-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 15px;
+    padding-bottom: 12px;
     border-bottom: 2px solid #e7e9fc;
+    flex-shrink: 0;
 }
 
 .card-title {
     color: #667eea;
-    font-size: 1.5em;
+    font-size: 1.3em;
     margin: 0;
 }
 
