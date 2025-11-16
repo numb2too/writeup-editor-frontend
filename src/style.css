@@ -168,6 +168,7 @@ body {
   display: flex;
   flex-direction: column;
   gap: 20px;
+  width: 100%;
 }
 
 .article-card {
@@ -176,16 +177,11 @@ body {
   border-radius: 10px;
   padding: 20px;
   transition: 0.3s;
+  width: 100%;
 }
 
 .article-card:hover {
-  border-color: #667eea;
-  box-shadow: 0 5px 15px rgba(102, 126, 234, 0.2);
-}
-
-.article-card.editing {
-  border-color: #51cf66;
-  box-shadow: 0 5px 15px rgba(81, 207, 102, 0.3);
+  box-shadow: 0 8px 20px rgba(102, 126, 234, 0.2);
 }
 
 .article-header {
