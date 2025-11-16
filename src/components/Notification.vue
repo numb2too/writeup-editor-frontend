@@ -1,7 +1,7 @@
 <template>
     <Transition name="slide">
         <div v-if="show" class="notification" :class="type">
-            {{ message }}
+            <div class="notification-content">{{ message }}</div>
         </div>
     </Transition>
 </template>
@@ -25,8 +25,14 @@ defineProps({
     box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
     z-index: 9999;
     min-width: 250px;
+    max-width: 450px;
     font-weight: 500;
     font-size: 14px;
+}
+
+.notification-content {
+    white-space: pre-line;
+    line-height: 1.6;
 }
 
 .notification.success {
@@ -39,7 +45,6 @@ defineProps({
     color: #c92a2a;
 }
 
-/* 過渡動畫 */
 .slide-enter-active {
     animation: slideIn 0.3s ease-out;
 }

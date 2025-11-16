@@ -13,8 +13,6 @@ export function useArticles() {
 
   const filteredArticles = computed(() => {
     let filtered = articles.value
-
-    // 使用 searchText 或 activeFilter 進行搜尋
     const search = (searchText.value || activeFilter.value || '').toLowerCase().trim()
 
     if (search) {
@@ -46,29 +44,52 @@ export function useArticles() {
     isDetecting.value = true
     try {
       const result = await api.detectNewFolders()
-      const newFolders = result.newFolders
+      const newFolders = result.newFolders || []
+      const missingFolders = result.missingFolders || []
 
-      if (newFolders.length === 0) {
-        showNotification('沒有發現新資料夾', 'success')
-        isDetecting.value = false
-        return
-      }
+      console.log('偵測結果:', result) // Debug
 
-      for (const folderName of newFolders) {
-        const newArticle = {
-          title: folderName,
-          description: folderName,
-          tools: ['knowledge', folderName],
-          date: getCurrentDate(),
-          folder: folderName,
-          platform: 'knowledge'
+      // 處理新資料夾
+      if (newFolders.length > 0) {
+        for (const folderName of newFolders) {
+          const newArticle = {
+            title: folderName,
+            description: folderName,
+            tools: ['knowledge', folderName],
+            date: getCurrentDate(),
+            folder: folderName,
+            platform: 'knowledge'
+          }
+          articles.value.unshift(newArticle)
         }
-        articles.value.unshift(newArticle)
+        await api.saveToJson(articles.value)
       }
 
-      await api.saveToJson(articles.value)
-      showNotification(`✅ 成功新增 ${newFolders.length} 個新資料夾`, 'success')
+      // 處理遺失資料夾
+      if (missingFolders.length > 0) {
+        const missingList = missingFolders.join('、')
+        showNotification(
+          `⚠️ 警告：發現 ${missingFolders.length} 個遺失的資料夾\n` +
+          `JSON 中存在但實際不存在：${missingList}\n` +
+          `請檢查是否已被刪除或移動`,
+          'error'
+        )
+      }
+
+      // 顯示綜合訊息
+      if (newFolders.length > 0 && missingFolders.length === 0) {
+        showNotification(`✅ 成功新增 ${newFolders.length} 個新資料夾`, 'success')
+      } else if (newFolders.length === 0 && missingFolders.length === 0) {
+        showNotification('✅ 沒有發現新資料夾或遺失資料夾', 'success')
+      } else if (newFolders.length > 0 && missingFolders.length > 0) {
+        showNotification(
+          `✅ 新增 ${newFolders.length} 個資料夾\n⚠️ 發現 ${missingFolders.length} 個遺失資料夾`,
+          'error'
+        )
+      }
+
     } catch (error) {
+      console.error('偵測錯誤:', error) // Debug
       showNotification('❌ 偵測失敗: ' + error.message, 'error')
     } finally {
       isDetecting.value = false
@@ -93,13 +114,13 @@ export function useArticles() {
   }
 
   const deleteArticle = async (article) => {
-    if (!confirm(`確定要刪除文章「${article.title}」嗎？`)) return
+    if (!confirm(`確定要刪除文章「${article.title}」嗎？\n注意：這只會從 JSON 中刪除，不會刪除實際資料夾。`)) return
 
     try {
       const index = articles.value.indexOf(article)
       articles.value.splice(index, 1)
       await api.saveToJson(articles.value)
-      showNotification('✅ 文章已刪除', 'success')
+      showNotification('✅ 文章已從 JSON 中刪除', 'success')
     } catch (error) {
       showNotification('❌ 刪除失敗: ' + error.message, 'error')
     }
@@ -122,6 +143,29 @@ export function useArticles() {
     article.tools = article.tools.filter(t => t !== tag)
     await api.saveToJson(articles.value)
     showNotification('✅ 標籤已刪除', 'success')
+  }
+
+  const addNewFolder = async (folderName) => {
+    try {
+      const result = await api.createFolder(folderName)
+
+      if (result.success) {
+        const newArticle = {
+          title: folderName,
+          description: folderName,
+          tools: ['knowledge', folderName],
+          date: getCurrentDate(),
+          folder: folderName,
+          platform: 'knowledge'
+        }
+        articles.value.unshift(newArticle)
+
+        await api.saveToJson(articles.value)
+        showNotification(`✅ 成功建立資料夾「${folderName}」`, 'success')
+      }
+    } catch (error) {
+      showNotification('❌ 建立資料夾失敗: ' + error.message, 'error')
+    }
   }
 
   const clearSearch = () => {
@@ -149,31 +193,6 @@ export function useArticles() {
       String(now.getSeconds()).padStart(2, '0')
   }
 
-  const addNewFolder = async (folderName) => {
-    try {
-      const result = await api.createFolder(folderName)
-
-      if (result.success) {
-        // 新增文章到列表
-        const newArticle = {
-          title: folderName,
-          description: folderName,
-          tools: ['knowledge', folderName],
-          date: getCurrentDate(),
-          folder: folderName,
-          platform: 'knowledge'
-        }
-        articles.value.unshift(newArticle)
-
-        // 儲存到 JSON
-        await api.saveToJson(articles.value)
-        showNotification(`✅ 成功建立資料夾「${folderName}」`, 'success')
-      }
-    } catch (error) {
-      showNotification('❌ 建立資料夾失敗: ' + error.message, 'error')
-    }
-  }
-
   onMounted(loadArticles)
 
   return {
@@ -188,7 +207,7 @@ export function useArticles() {
     deleteArticle,
     addTagToArticle,
     removeTagFromArticle,
-    addNewFolder,  // 新增
+    addNewFolder,
     clearSearch,
     filterByTag
   }

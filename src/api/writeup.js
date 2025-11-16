@@ -25,7 +25,8 @@ export async function detectNewFolders() {
     })
     const result = await response.json()
     if (!result.success) throw new Error(result.message)
-    return result
+    // 回傳 data 物件，包含 newFolders 和 missingFolders
+    return result.data
 }
 
 export async function createFolder(folderName) {
