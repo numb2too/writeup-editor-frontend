@@ -46,8 +46,33 @@ export function useArticles() {
       const result = await api.detectNewFolders()
       const newFolders = result.newFolders || []
       const missingFolders = result.missingFolders || []
+      const caseMismatch = result.caseMismatch || {}
 
       console.log('偵測結果:', result) // Debug
+
+      // 處理大小寫不一致的情況
+      if (Object.keys(caseMismatch).length > 0) {
+        let mismatchMessage = '⚠️ 發現資料夾名稱大小寫不一致：\n'
+        for (const [jsonName, actualName] of Object.entries(caseMismatch)) {
+          mismatchMessage += `JSON: "${jsonName}" ↔ 實際: "${actualName}"\n`
+        }
+        mismatchMessage += '\n是否要自動修正 JSON 中的名稱？'
+
+        if (confirm(mismatchMessage)) {
+          // 自動修正大小寫
+          for (const [jsonName, actualName] of Object.entries(caseMismatch)) {
+            const article = articles.value.find(a => a.folder === jsonName)
+            if (article) {
+              article.folder = actualName
+              if (article.title === jsonName) {
+                article.title = actualName
+              }
+            }
+          }
+          await api.saveToJson(articles.value)
+          showNotification('✅ 已自動修正資料夾名稱大小寫', 'success')
+        }
+      }
 
       // 處理新資料夾
       if (newFolders.length > 0) {
@@ -65,11 +90,15 @@ export function useArticles() {
         await api.saveToJson(articles.value)
       }
 
-      // 處理遺失資料夾
-      if (missingFolders.length > 0) {
-        const missingList = missingFolders.join('、')
+      // 處理真正遺失的資料夾（排除大小寫問題）
+      const reallyMissingFolders = missingFolders.filter(
+        folder => !Object.keys(caseMismatch).includes(folder)
+      )
+
+      if (reallyMissingFolders.length > 0) {
+        const missingList = reallyMissingFolders.join('、')
         showNotification(
-          `⚠️ 警告：發現 ${missingFolders.length} 個遺失的資料夾\n` +
+          `⚠️ 警告：發現 ${reallyMissingFolders.length} 個遺失的資料夾\n` +
           `JSON 中存在但實際不存在：${missingList}\n` +
           `請檢查是否已被刪除或移動`,
           'error'
@@ -77,19 +106,14 @@ export function useArticles() {
       }
 
       // 顯示綜合訊息
-      if (newFolders.length > 0 && missingFolders.length === 0) {
+      if (newFolders.length > 0 && reallyMissingFolders.length === 0 && Object.keys(caseMismatch).length === 0) {
         showNotification(`✅ 成功新增 ${newFolders.length} 個新資料夾`, 'success')
-      } else if (newFolders.length === 0 && missingFolders.length === 0) {
+      } else if (newFolders.length === 0 && reallyMissingFolders.length === 0 && Object.keys(caseMismatch).length === 0) {
         showNotification('✅ 沒有發現新資料夾或遺失資料夾', 'success')
-      } else if (newFolders.length > 0 && missingFolders.length > 0) {
-        showNotification(
-          `✅ 新增 ${newFolders.length} 個資料夾\n⚠️ 發現 ${missingFolders.length} 個遺失資料夾`,
-          'error'
-        )
       }
 
     } catch (error) {
-      console.error('偵測錯誤:', error) // Debug
+      console.error('偵測錯誤:', error)
       showNotification('❌ 偵測失敗: ' + error.message, 'error')
     } finally {
       isDetecting.value = false
