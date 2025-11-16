@@ -283,6 +283,7 @@
             margin-top: 10px;
             display: flex;
             gap: 10px;
+            position: relative;
         }
 
         .add-tag-input {
@@ -291,6 +292,51 @@
             border: 2px solid #ddd;
             border-radius: 5px;
             font-size: 0.9em;
+        }
+
+        .tag-suggestions {
+            position: absolute;
+            top: 100%;
+            left: 0;
+            right: 60px;
+            background: white;
+            border: 2px solid #667eea;
+            border-radius: 5px;
+            max-height: 200px;
+            overflow-y: auto;
+            z-index: 1000;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            display: none;
+        }
+
+        .tag-suggestions.show {
+            display: block;
+        }
+
+        .tag-suggestion-item {
+            padding: 8px 12px;
+            cursor: pointer;
+            border-bottom: 1px solid #eee;
+            font-size: 0.9em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .tag-suggestion-item:hover {
+            background: #f0f2ff;
+        }
+
+        .tag-suggestion-item:last-child {
+            border-bottom: none;
+        }
+
+        .tag-suggestion-count {
+            background: #e7e9fc;
+            color: #667eea;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.8em;
         }
 
         .add-tag-btn {
@@ -700,7 +746,16 @@
                 ).join('')}
                         
                         <div class="add-tag-section">
-                            <input type="text" class="add-tag-input" id="newTag-${originalIndex}" placeholder="新增標籤...">
+                            <div style="position: relative; flex: 1;">
+                                <input type="text" 
+                                       class="add-tag-input" 
+                                       id="newTag-${originalIndex}" 
+                                       placeholder="輸入標籤（模糊搜尋）..."
+                                       onkeyup="showTagSuggestions(${originalIndex})"
+                                       onfocus="showTagSuggestions(${originalIndex})"
+                                       autocomplete="off">
+                                <div class="tag-suggestions" id="suggestions-${originalIndex}"></div>
+                            </div>
                             <button class="add-tag-btn" onclick="addTag(${originalIndex})">+ 新增</button>
                         </div>
                     </div>
@@ -773,12 +828,76 @@
             articles[index].tools.push(newTag);
             input.value = '';
 
+            // 隱藏建議列表
+            const suggestions = document.getElementById(`suggestions-${index}`);
+            if (suggestions) {
+                suggestions.classList.remove('show');
+            }
+
             await saveToJSON();
             renderArticles();
             renderAllTags();
             updateStats();
             showNotification('標籤已新增', 'success');
         }
+
+        function showTagSuggestions(index) {
+            const input = document.getElementById(`newTag-${index}`);
+            const suggestionsDiv = document.getElementById(`suggestions-${index}`);
+            const searchText = input.value.toLowerCase().trim();
+
+            if (!searchText) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+
+            // 取得所有標籤並過濾
+            const allTags = getAllTags();
+            const currentTags = articles[index].tools;
+
+            const matches = Object.entries(allTags)
+                .filter(([tag, count]) => {
+                    // 模糊搜尋：標籤中包含搜尋文字
+                    return tag.toLowerCase().includes(searchText) &&
+                        !currentTags.includes(tag); // 排除已存在的標籤
+                })
+                .sort((a, b) => b[1] - a[1]); // 按使用次數排序
+
+            if (matches.length === 0) {
+                suggestionsDiv.classList.remove('show');
+                return;
+            }
+
+            // 顯示建議列表
+            suggestionsDiv.innerHTML = matches.slice(0, 10).map(([tag, count]) => `
+                <div class="tag-suggestion-item" onclick="selectSuggestion(${index}, '${tag.replace(/'/g, "\\'")}')">
+                    <span>${tag}</span>
+                    <span class="tag-suggestion-count">${count}</span>
+                </div>
+            `).join('');
+
+            suggestionsDiv.classList.add('show');
+        }
+
+        function selectSuggestion(index, tag) {
+            const input = document.getElementById(`newTag-${index}`);
+            input.value = tag;
+
+            const suggestionsDiv = document.getElementById(`suggestions-${index}`);
+            suggestionsDiv.classList.remove('show');
+
+            // 自動新增標籤
+            addTag(index);
+        }
+
+        // 點擊外部關閉建議列表
+        document.addEventListener('click', function (e) {
+            if (!e.target.closest('.add-tag-section')) {
+                document.querySelectorAll('.tag-suggestions').forEach(div => {
+                    div.classList.remove('show');
+                });
+            }
+        });
 
         async function removeTag(index, tag) {
             if (confirm(`確定要刪除標籤「${tag}」嗎？`)) {
