@@ -47,14 +47,30 @@ export function useArticles() {
       const newFolders = result.newFolders || []
       const missingFolders = result.missingFolders || []
       const caseMismatch = result.caseMismatch || {}
+      const duplicateFolders = result.duplicateFolders || {}
 
       console.log('偵測結果:', result) // Debug
 
-      // 處理大小寫不一致的情況
+      // 1. 處理重複的 folder
+      if (Object.keys(duplicateFolders).length > 0) {
+        let duplicateMessage = '❌ 發現 JSON 中有重複的資料夾：\n\n'
+        for (const [folder, count] of Object.entries(duplicateFolders)) {
+          duplicateMessage += `📁 "${folder}" 出現了 ${count} 次\n`
+        }
+        duplicateMessage += '\n請手動修正 JSON 檔案，刪除重複的項目。'
+
+        showNotification(duplicateMessage, 'error', 8000)
+
+        // 如果有重複，先不處理其他問題
+        isDetecting.value = false
+        return
+      }
+
+      // 2. 處理大小寫不一致的情況
       if (Object.keys(caseMismatch).length > 0) {
-        let mismatchMessage = '⚠️ 發現資料夾名稱大小寫不一致：\n'
+        let mismatchMessage = '⚠️ 發現資料夾名稱大小寫不一致：\n\n'
         for (const [jsonName, actualName] of Object.entries(caseMismatch)) {
-          mismatchMessage += `JSON: "${jsonName}" ↔ 實際: "${actualName}"\n`
+          mismatchMessage += `📁 JSON: "${jsonName}" ↔ 實際: "${actualName}"\n`
         }
         mismatchMessage += '\n是否要自動修正 JSON 中的名稱？'
 
@@ -74,7 +90,7 @@ export function useArticles() {
         }
       }
 
-      // 處理新資料夾
+      // 3. 處理新資料夾
       if (newFolders.length > 0) {
         for (const folderName of newFolders) {
           const newArticle = {
@@ -90,26 +106,47 @@ export function useArticles() {
         await api.saveToJson(articles.value)
       }
 
-      // 處理真正遺失的資料夾（排除大小寫問題）
+      // 4. 處理真正遺失的資料夾（排除大小寫問題）
       const reallyMissingFolders = missingFolders.filter(
         folder => !Object.keys(caseMismatch).includes(folder)
       )
 
       if (reallyMissingFolders.length > 0) {
         const missingList = reallyMissingFolders.join('、')
-        showNotification(
-          `⚠️ 警告：發現 ${reallyMissingFolders.length} 個遺失的資料夾\n` +
-          `JSON 中存在但實際不存在：${missingList}\n` +
-          `請檢查是否已被刪除或移動`,
-          'error'
+
+        const shouldDelete = confirm(
+          `⚠️ 發現 ${reallyMissingFolders.length} 個遺失的資料夾：\n\n` +
+          `${missingList}\n\n` +
+          `這些資料夾在 JSON 中存在但實際不存在。\n` +
+          `是否要從 JSON 中刪除這些項目？`
         )
+
+        if (shouldDelete) {
+          // 從 JSON 中刪除遺失的資料夾
+          articles.value = articles.value.filter(
+            article => !reallyMissingFolders.includes(article.folder)
+          )
+          await api.saveToJson(articles.value)
+          showNotification(`✅ 已從 JSON 中刪除 ${reallyMissingFolders.length} 個遺失的資料夾`, 'success')
+        } else {
+          showNotification(
+            `⚠️ 警告：${reallyMissingFolders.length} 個遺失的資料夾未處理`,
+            'error'
+          )
+        }
       }
 
-      // 顯示綜合訊息
-      if (newFolders.length > 0 && reallyMissingFolders.length === 0 && Object.keys(caseMismatch).length === 0) {
+      // 5. 顯示綜合訊息
+      if (newFolders.length > 0 &&
+        reallyMissingFolders.length === 0 &&
+        Object.keys(caseMismatch).length === 0 &&
+        Object.keys(duplicateFolders).length === 0) {
         showNotification(`✅ 成功新增 ${newFolders.length} 個新資料夾`, 'success')
-      } else if (newFolders.length === 0 && reallyMissingFolders.length === 0 && Object.keys(caseMismatch).length === 0) {
-        showNotification('✅ 沒有發現新資料夾或遺失資料夾', 'success')
+      } else if (newFolders.length === 0 &&
+        reallyMissingFolders.length === 0 &&
+        Object.keys(caseMismatch).length === 0 &&
+        Object.keys(duplicateFolders).length === 0) {
+        showNotification('✅ 沒有發現任何問題', 'success')
       }
 
     } catch (error) {
