@@ -59,7 +59,7 @@
 </template>
 
 <script setup>
-import { reactive, computed } from 'vue'
+import { reactive, computed, watch } from 'vue'
 
 const props = defineProps({
     article: Object
@@ -74,6 +74,17 @@ const formData = reactive({
     platform: props.article.platform || '',
     date: props.article.date
 })
+
+// 監聽 article 變化，同步更新 formData
+watch(() => props.article, (newArticle) => {
+    if (newArticle) {
+        formData.title = newArticle.title
+        formData.folder = newArticle.folder
+        formData.description = newArticle.description
+        formData.platform = newArticle.platform || ''
+        formData.date = newArticle.date
+    }
+}, { immediate: true })
 
 const displayDate = computed(() => {
     return props.article.date.split(' ')[0]
