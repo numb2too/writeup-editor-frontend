@@ -11,3 +11,4 @@ npm run dev
 
 ## 預覽樣式
 ![alt text](image.png)
+![alt text](image1.png)
